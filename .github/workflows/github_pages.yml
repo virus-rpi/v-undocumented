@@ -21,9 +21,10 @@ jobs:
             cd v
             make
 
-      - name: Generate documentation HTML
+      - name: Generate HTML
         run: |
           ./v/v run main.v
+          mkdir site
           mv doc_coverage.html site/index.html
 
       - name: Upload artifact
