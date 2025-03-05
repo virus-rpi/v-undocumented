@@ -86,7 +86,7 @@ fn generate_html(stats []LibStats) string {
 
 	mut html_head :=
 		'<!DOCTYPE html>\n<html>\n<head><title>VLib Docs Coverage</title>
-	<style>body{font-family:sans-serif;margin:20px;background:#121212;color:#fff}table{width:100%;border-collapse:collapse}th,td{border:1px solid #444;padding:8px;text-align:left}th{background:#1e1e1e;color:#fff}tr:nth-child(even){background:#222}a{color:#62baff;text-decoration:none}a:hover{text-decoration:underline}ul{margin:5px 0;padding-left:20px} .coverage-high{background:#4CAF50;color:#fff} .coverage-medium{background:#FFC107;color:#000} .coverage-low{background:#F44336;color:#fff} .coverage-very-low{background:#D32F2F;color:#fff}</style>
+	<style>body{font-family:sans-serif;margin:20px;background:#121212;color:#fff}table{width:100%;border-collapse:collapse}th,td{border:1px solid #444;padding:8px;text-align:left}th{background:#1e1e1e;color:#fff}tr:nth-child(even){background:#222}a{color:#62baff;text-decoration:none}a:hover{text-decoration:underline}ul{margin:5px 0;padding-left:20px} .coverage-perfect{background:#4CAF50;color:#fff} .coverage-high{background:#61ed67;color:#000} .coverage-medium{background:#FFC107;color:#000} .coverage-low{background:#F44336;color:#fff} .coverage-very-low{background:#D32F2F;color:#fff}</style>
 	<style>.progressbar-outer{width:100%;background-color:#333;height:20px;border-radius:4px;margin:10px 0;} @keyframes fillBar {0% {width:0%;}100% {width:' +
 		'${overall_coverage}%;}} .progressbar-inner{animation:fillBar 0.7s ease-in-out forwards; background-color:#4CAF50;height:100%;border-radius:4px; display: flex; align-items: center; justify-content: center;} @keyframes fadeIn {0% {opacity: 0;}100% {opacity: 1;}} .progressbar-label{animation:fadeIn 0.7s ease-in-out forwards;}</style>
 	</head>'
@@ -109,13 +109,15 @@ fn generate_html(stats []LibStats) string {
 			100.0
 		}
 
-		mut coverage_class := 'coverage-high'
+		mut coverage_class := 'coverage-perfect'
 		if coverage < 25.0 {
 			coverage_class = 'coverage-very-low'
 		} else if coverage < 50.0 {
 			coverage_class = 'coverage-low'
 		} else if coverage < 80.0 {
 			coverage_class = 'coverage-medium'
+		} else if coverage < 100.0 {
+			coverage_class = 'coverage-high'
 		}
 
 		click_id := 'undoc_${i}'
