@@ -24,13 +24,13 @@ jobs:
       - name: Generate documentation HTML
         run: |
           ./v/v run main.v
-          mv doc_coverage.html index.html
+          mv doc_coverage.html site/index.html
 
       - name: Upload artifact
         id: deployment
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./index.html
+          path: ./site/
           retention-days: 1
 
   deploy:
