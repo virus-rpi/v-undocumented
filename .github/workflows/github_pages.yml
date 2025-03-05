@@ -1,0 +1,35 @@
+name: Generate Doc Coverage and Deploy
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install V Compiler
+        run: |
+          curl -L https://github.com/vlang/v/releases/latest/download/v_linux.tar.gz | tar -xz
+          sudo mv v /usr/local/bin/v
+          v version
+
+      - name: Generate documentation HTML
+        run: |
+          v run main.v
+          # Rename the generated file to index.html for GitHub Pages
+          mv doc_coverage.html index.html
+          cat index.html
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./
+          publish_branch: gh-pages
+          user_name: github-actions
+          user_email: github-actions@github.com
