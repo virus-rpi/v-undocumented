@@ -15,16 +15,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install V Compiler
+      - name: Install V
         run: |
-          curl -L https://github.com/vlang/v/releases/latest/download/v_linux.tar.gz | tar -xz
-          sudo mv v /usr/local/bin/v
-          v version
+            git clone --depth=1 https://github.com/vlang/v
+            cd v
+            make
 
       - name: Generate documentation HTML
         run: |
-          v run main.v
-          # Rename the generated file to index.html for GitHub Pages
+          ./v/v run main.v
           mv doc_coverage.html index.html
           cat index.html
 
