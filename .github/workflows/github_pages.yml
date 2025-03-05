@@ -30,7 +30,8 @@ jobs:
         id: deployment
         uses: actions/upload-pages-artifact@v3
         with:
-          name: ./index.html
+          path: ./index.html
+          retention-days: 1
 
   deploy:
     needs: build
