@@ -100,7 +100,12 @@ fn generate_html(stats []LibStats) string {
 	<div class="progressbar-inner"><span class="progressbar-label">${overall_coverage:.2f}%</span></div>
 	</div><br>'
 
-	html_body += '<table><tr><th>Library</th><th>Public Methods</th><th>Undocumented</th><th>Coverage %</th></tr>'
+	html_body += '<table id="coverageTable"><thead><tr>'
+	html_body += '<th onclick="sortTable(0, \'text\')">Library</th>'
+	html_body += '<th onclick="sortTable(1, \'num\')">Public Methods</th>'
+	html_body += '<th onclick="sortTable(2, \'num\')">Undocumented</th>'
+	html_body += '<th onclick="sortTable(3, \'num\')">Coverage %</th>'
+	html_body += '</tr></thead><tbody>'
 	mut rows := ''
 	for i, stat in stats {
 		coverage := if stat.pub_methods > 0 {
@@ -119,18 +124,57 @@ fn generate_html(stats []LibStats) string {
 		} else if coverage < 100.0 {
 			coverage_class = 'coverage-high'
 		}
-
 		click_id := 'undoc_${i}'
-		rows += '<tr><td>${stat.name}</td><td>${stat.pub_methods}</td>
-		<td><a href="javascript:void(0)" onClick="showUndocumented(\'${click_id}\')">${stat.undocumented_count}</a>
-		<div id="${click_id}" style="display:none;background:#333;padding:10px;border-radius:5px"><ul>'
+		rows += '<tr>'
+		rows += '<td>${stat.name}</td>'
+		rows += '<td>${stat.pub_methods}</td>'
+		rows += "<td><a href=\"javascript:void(0)\" onClick=\"showUndocumented('${click_id}')\">${stat.undocumented_count}</a>"
+		rows += "<div id=\"${click_id}\" style=\"display:none;background:#333;padding:10px;border-radius:5px\"><ul>"
 		for meth in stat.undocumented_methods {
 			rows += '<li>${meth.replace('<', '&lt;').replace('>', '&gt;')}</li>'
 		}
-		rows += '</ul></div></td><td class="${coverage_class}">${coverage:.2f}%</td></tr>'
+		rows += '</ul></div></td>'
+		rows += "<td class=\"${coverage_class}\">${coverage:.2f}%</td>"
+		rows += '</tr>'
+	}
+	html_body += rows + '</tbody></table>'
+
+	mut html_footer := '<script>
+	function sortTable(n, type) {
+	  var table = document.getElementById("coverageTable");
+	  var tbody = table.tBodies[0];
+	  var rows = Array.from(tbody.rows);
+	  var asc = table.getAttribute("data-sort-dir-" + n) === "desc";
+	  rows.sort(function(a, b) {
+	    var x = a.getElementsByTagName("TD")[n].innerText;
+	    var y = b.getElementsByTagName("TD")[n].innerText;
+	    if (type === "num") {
+	      x = parseFloat(a.getElementsByTagName("TD")[n].innerText) || 0;
+	      y = parseFloat(b.getElementsByTagName("TD")[n].innerText) || 0;
+	    } else {
+	      x = b.getElementsByTagName("TD")[n].innerText.toLowerCase();
+	      y = a.getElementsByTagName("TD")[n].innerText.toLowerCase();
+	    }
+	    return asc ? (x > y ? 1 : -1) : (x < y ? 1 : -1);
+	  });
+	  for (var i = 0; i < rows.length; i++) {
+	    tbody.appendChild(rows[i]);
+	  }
+	  table.setAttribute("data-sort-dir-" + n, asc ? "asc" : "desc");
+
+	  var headers = table.tHead.rows[0].getElementsByTagName("TH");
+	  for (var i = 0; i < headers.length; i++) {
+	    headers[i].textContent = headers[i].textContent.replace(\'  \\u25B2\', \'\').replace(\'  \\u25BC\', \'\');
+	  }
+	  var indicator = asc ? \'  \\u25B2\' : \'  \\u25BC\';
+	  headers[n].textContent += indicator;
 	}
 
-	mut html_footer := '</table><script>function showUndocumented(id){var div=document.getElementById(id);div.style.display=(div.style.display==="none")?"block":"none";}</script>'
+	function showUndocumented(id) {
+	  var div = document.getElementById(id);
+	  div.style.display = (div.style.display === "none") ? "block" : "none";
+	}
+	</script>'
 	html_footer += '<script>
 	function animateValue(id, start, end, duration) {
 	  let obj = document.getElementById(id);
@@ -151,11 +195,13 @@ fn generate_html(stats []LibStats) string {
 	  requestAnimationFrame(update);
 	}
 	window.onload=function(){
+	  sortTable(0, "text");
 	  animateValue("total_methods",0,${total_methods},700);
 	  animateValue("total_undoc",0,${total_undoc},700);
 	};
 	</script></body></html>'
-	return html_head + html_body + rows + html_footer
+
+	return html_head + html_body + html_footer
 }
 
 fn main() {
