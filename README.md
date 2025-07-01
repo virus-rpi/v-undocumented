@@ -1,5 +1,14 @@
 # V Undocumented
 
+---
+
+# NOTE: 
+This repo became redundant.  
+The page is now a part of [V Dashboards](https://github.com/virus-rpi/v-dashboards)   
+You can access the documentation coverage at https://v.owo.computer/vlib-docs
+
+---
+
 A simple dashboard that shows the documatation coverage of vlib. It should update every 24h
 
 [Current deployment](https://virus-rpi.github.io/v-undocumented/)
